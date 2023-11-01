@@ -68,7 +68,7 @@ def getWeekArr(klines:list):
     smallArr = []
     for index, m in enumerate(klines):
         w = m["week_day"]
-        
+    
         if w == 0 :
             smallArr.clear()
             smallArr.append(m)
