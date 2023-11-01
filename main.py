@@ -38,16 +38,28 @@ def getBksData(id):
               "_":"1682946187249"}
     url = "http://59.push2his.eastmoney.com/api/qt/stock/kline/get"
     data = request(requestMethod.GET,url,params=params)
-    list = [];
-
     print(data)
+    return data
 
+def getKlinsArr(klines:list):
+
+    arr = [];
+    for s in klines:
+       l = s.split(",")
+       m = {"date":l[0],"high":l[1]}
+       arr.append(m)
+    
+    return arr
+ 
 def main():
     # bk = BKModel()  
     # print("-----")
     list = getbks()
     model = list[0]
-    getBksData(id=model.bkId)
+    bkdata = getBksData(id=model.bkId)
+    klines = bkdata['data']["klines"];
+    arr = getKlinsArr(klines)
+    print(arr)
     
     
     # getBksData()
