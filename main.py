@@ -5,7 +5,8 @@ import re
 from Request.zskrequest import request,requestMethod
 from Model.bkModel import BKModel
 from Model.kModel import kModel
-
+from datetime import datetime
+import copy
 
 ##获取板块列表
 def getbks():
@@ -17,7 +18,7 @@ def getbks():
     for json in bklist:
         model = BKModel()
         model.fromJson(json=json)
-        print(model)
+        # print(model)
         list.append(model)
     return list
 
@@ -38,7 +39,7 @@ def getBksData(id):
               "_":"1682946187249"}
     url = "http://59.push2his.eastmoney.com/api/qt/stock/kline/get"
     data = request(requestMethod.GET,url,params=params)
-    print(data)
+    # print(data)
     return data
 
 def getKlinsArr(klines:list):
@@ -46,10 +47,39 @@ def getKlinsArr(klines:list):
     arr = [];
     for s in klines:
        l = s.split(",")
-       m = {"date":l[0],"high":l[1]}
+       date_string = l[0];
+       date_format = "%Y-%m-%d"
+       date_time_obj = datetime.strptime(date_string, date_format)
+       # 获取月份
+       month = date_time_obj.month
+       week_day = date_time_obj.weekday()
+       m = {"date":l[0],"month":month,"week_day":week_day,"high":l[1]}
        arr.append(m)
     
     return arr
+
+def getMonthArr(klines:list):
+    
+    return
+
+def getWeekArr(klines:list):
+    
+    arr = []
+    smallArr = []
+    for index, m in enumerate(klines):
+        w = m["week_day"]
+        
+        if w == 0 :
+            smallArr.clear()
+            smallArr.append(m)
+        elif w == 4 or index == (len(klines) - 1):
+            smallArr.append(m)
+            copied_list = copy.deepcopy(smallArr)
+            arr.append(copied_list)
+        else :
+            smallArr.append(m)
+            
+    return arr     
  
 def main():
     # bk = BKModel()  
@@ -59,7 +89,9 @@ def main():
     bkdata = getBksData(id=model.bkId)
     klines = bkdata['data']["klines"];
     arr = getKlinsArr(klines)
-    print(arr)
+    # print(arr)
+    weekArr = getWeekArr(arr)
+    print(weekArr)
     
     
     # getBksData()
