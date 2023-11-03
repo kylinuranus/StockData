@@ -59,8 +59,22 @@ def getKlinsArr(klines:list):
     return arr
 
 def getMonthArr(klines:list):
+    arr = [];
+    small_arr = []
+    temp_month = 0;
+    for index, map in enumerate(klines):
+         m = map["month"]
+         print(m)
+         if temp_month == m :
+           small_arr.append(map)
+         elif temp_month != m or index == (len(klines) - 1) :
+           copied_list = copy.deepcopy(small_arr)
+           arr.append(copied_list)
+           small_arr.clear()
+           temp_month = m
+           small_arr.append(map)    
     
-    return
+    return arr
 
 def getWeekArr(klines:list):
     
@@ -91,7 +105,8 @@ def main():
     arr = getKlinsArr(klines)
     # print(arr)
     weekArr = getWeekArr(arr)
-    print(weekArr)
+    month_arr = getMonthArr(arr)
+    print(month_arr)
     
     
     # getBksData()
