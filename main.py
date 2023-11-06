@@ -6,7 +6,6 @@ from Model.bkModel import BKModel
 from Model.kModel import kModel
 from datetime import datetime
 import copy
-import numpy as np
 
 
 
@@ -79,12 +78,19 @@ def get_stocks_list(id):
         "fqt": 1,
         "beg": "0",
         "end": "20500101",
-        "smplmt": "460",
+        "smplmt": "100",
         "lmt": "1000000",
         "_": "1699199779947",
     }
     url = "https://push2his.eastmoney.com/api/qt/stock/kline/get"
     data = request(requestMethod.GET, url, params=params)
+    list_data = data["data"]["klines"]
+    arr = get_klines_arr(list_data, 3, 1, 2, 4, 0)
+    return {
+        "id": data["data"]["code"],
+        "name": data["data"]["name"],
+        "data": arr,
+    }
 
 
 def get_klines_arr(klines: list, high: int, open: int, close: int, low: int, date: int):
@@ -135,7 +141,6 @@ def get_week_arr(klines: list):
     small_arr = []
     for index, m in enumerate(klines):
         w = m["week_day"]
-
         if w == 0:
             small_arr.clear()
             small_arr.append(m)
@@ -147,6 +152,39 @@ def get_week_arr(klines: list):
             small_arr.append(m)
 
     return arr
+
+def general_klines(arr):
+    
+    list = []
+    for small_arr in arr:
+        high = "0"
+        close = "0"
+        open = "0"
+        low = "0"
+        for index , m in enumerate(small_arr):
+            temp_high = float(m["high"])
+            temp_low = float(m["low"])
+            if temp_high >= float(high):
+                high = temp_high
+            if temp_low <= float(low):
+                low = temp_low
+                
+            if index == 0:
+                open = float(m["open"])
+            if index == (len(small_arr) - 1):
+                close = float( m["close"])
+        
+        m = {
+            "high": high,
+            "open": open,
+            "low": low,
+            "close": close,
+        }
+        list.append(m)
+    return list
+
+def math0(arr):
+    return
 
 
 def main():
@@ -160,6 +198,15 @@ def main():
         k_bk_stocks_list = get_stocks_data(id)
         all_stock_list.append(k_bk_stocks_list)
         
+    data_map = get_stocks_list(all_stock_list[0][0]["id"])
+    print(data_map["name"])
+    week_arr = get_week_arr(data_map["data"])
+    # month_arr = get_month_arr(data_map["data"])
+    week_klins = general_klines(week_arr)
+    print(week_klins)
+    
+    
+    # print(data_map)
     # all_stock_list_new = list(np.array(all_stock_list,dtype = object).flatten())
     # print(len(all_stock_list_new))    
     #k_bk_lines_map = get_bks_data(id)
